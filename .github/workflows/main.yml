@@ -1,0 +1,15 @@
+name: Notify Discord on PR Creation
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          text: "Створено новий Pull Request: ${{ github.event.pull_request.title }}\nДеталі: ${{ github.event.pull_request.html_url }}"
