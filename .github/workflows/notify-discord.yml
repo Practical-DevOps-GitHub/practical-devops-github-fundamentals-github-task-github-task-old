@@ -1,0 +1,17 @@
+name: Notify Discord on PR Creation
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification to Discord
+        env:
+          WEBHOOK_URL: https://discord.com/api/webhooks/1310202635508387922/-3q--8lZ33I9N6x3CyJokj-bBKJEn3tAFgvM0rP8vTpkXwpaAmdcXe7KSGM73t80LeZX
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "A new Pull Request has been created: **${{ github.event.pull_request.title }}**. View it here: ${{ github.event.pull_request.html_url }}"}' \
+          $WEBHOOK_URL
