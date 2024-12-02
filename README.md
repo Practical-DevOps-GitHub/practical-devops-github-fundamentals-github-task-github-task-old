@@ -1,4 +1,4 @@
-# Task on GitHub Topic
+# Task on GitHub Topic.
 
 1. Add user `softservedata` to this repository.
 
