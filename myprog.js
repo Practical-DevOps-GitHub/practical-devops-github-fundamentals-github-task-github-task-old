@@ -2,7 +2,7 @@ function sumNumbers(a, b) {
   return a + b;
 }
 
-console.log("Вітаю! Ця програма обчислює суму або двох чисел.");
+console.log("Вітаю! Ця програма обчислює суму  двох чисел.");
 
 const number1 = parseFloat(prompt("Введіть перше число:"));
 const number2 = parseFloat(prompt("Введіть друге число:"));
