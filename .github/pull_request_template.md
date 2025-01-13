@@ -1,6 +1,10 @@
-## Describe your changes
-## Issue ticket number and link
-## Checklist before requesting a review
+### Describe your changes
+[Write a clear description of what changes were made]
+
+### Issue ticket number and link
+[Add the ticket number and link to the issue]
+
+### Checklist before requesting a review
 - [ ] I have performed a self-review of my code
 - [ ] If it is a core feature, I have added thorough tests
 - [ ] Do we need to implement analytics?
