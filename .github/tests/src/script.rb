@@ -61,6 +61,19 @@ class GithubApi
     JSON.parse(response.body)["required_pull_request_reviews"]
   end
 
+  def get_branch_ruleset(branch_name)
+    branch_ruleset = nil
+    response = get("rulesets")
+    JSON.parse(response.body).each do |ruleset|
+      id = ruleset['id']
+      details = get("rulesets/#{id}")
+      if JSON.parse(details.body)['conditions']['ref_name']['include'].any? {|elem| elem.include?(branch_name)}
+        branch_ruleset = JSON.parse(details.body)['rules']
+      end
+    end
+      branch_ruleset
+  end
+
   def deploy_keys
     response = get("keys")
     return nil if response.code != '200'
@@ -68,5 +81,3 @@ class GithubApi
   end
 
 end
-
-

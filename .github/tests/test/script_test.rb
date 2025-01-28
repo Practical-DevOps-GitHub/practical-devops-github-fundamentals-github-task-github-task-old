@@ -29,7 +29,7 @@ class ScriptTest < Test::Unit::TestCase
 
   def test_main_present
     actual = @obj.branch_exist?('main')
-    assert(actual, 'Branch nain is not present')
+    assert(actual, 'Branch main is not present')
   end
 
   def test_main_protected
@@ -66,31 +66,43 @@ class ScriptTest < Test::Unit::TestCase
   end
 
   def test_deny_merge_main
-    actual = @obj.rules_required_pull_request_reviews('main')
-    assert_not_nil(actual, 'We should not allow merge to main branch without PR')
+    classic_rules = @obj.rules_required_pull_request_reviews('main')
+    rulesets = @obj.get_branch_ruleset('main')
+    rulesets_rules = rulesets&.find { |rule| rule['type'] == 'pull_request' }
+    assert_not_nil(classic_rules || rulesets_rules, 'We should not allow merge to main branch without PR')
   end
 
   def test_deny_merge_develop
-    actual = @obj.rules_required_pull_request_reviews('develop')
-    assert_not_nil(actual, 'We should not allow merge to develop branch without PR ')
+    classic_rules = @obj.rules_required_pull_request_reviews('develop')
+    rulesets = @obj.get_branch_ruleset('develop')
+    rulesets_rules = rulesets&.find { |rule| rule['type'] == 'pull_request' }
+    assert_not_nil(classic_rules || rulesets_rules, 'We should not allow merge to develop branch without PR ')
   end
 
   def test_2_approvals_develop
-    actual = @obj.rules_required_pull_request_reviews('develop').nil? || @obj.rules_required_pull_request_reviews('develop')["required_approving_review_count"]
+    classic_required_approving_review_count = @obj.rules_required_pull_request_reviews('develop').nil? || @obj.rules_required_pull_request_reviews('develop')["required_approving_review_count"]
+    pull_request_rulesets_rules = @obj.get_branch_ruleset('develop')
+    rulesets_required_approving_review_count = pull_request_rulesets_rules&.find { |rule| rule['type'] == 'pull_request' }&.[]('parameters')&.[]('required_approving_review_count')
     expected = 2
-    assert_equal(expected, actual, 'We should have 2 approvals before merge to develop branch')
+    required_approving_review_count = classic_required_approving_review_count == expected || rulesets_required_approving_review_count == expected
+    assert_true(required_approving_review_count, 'We should have 2 approvals before merge to develop branch')
   end
 
   def test_without_approval_main
-    actual = @obj.rules_required_pull_request_reviews('main').nil? || @obj.rules_required_pull_request_reviews('main')["required_approving_review_count"]
+    classic_required_approving_review_count = @obj.rules_required_pull_request_reviews('main').nil? || @obj.rules_required_pull_request_reviews('main')["required_approving_review_count"]
+    pull_request_rulesets_rules = @obj.get_branch_ruleset('main')
+    rulesets_required_approving_review_count = pull_request_rulesets_rules&.find { |rule| rule['type'] == 'pull_request' }&.[]('parameters')&.[]('required_approving_review_count')
     expected = 0
-    assert_equal(expected, actual, 'We shouldn\'t have any approvals before merge to main branch')
+    required_approving_review_count = classic_required_approving_review_count == expected || rulesets_required_approving_review_count == expected
+    assert_true(required_approving_review_count, 'We shouldn\'t have any approvals before merge to main branch')
   end
 
   def test_approve_from_user
     user_name = 'online-marathon'
-    actual = @obj.rules_required_pull_request_reviews('develop').nil? || @obj.rules_required_pull_request_reviews('develop')["require_code_owner_reviews"]
-    assert_not_nil(actual, "We should not allow merge to main branch without approve from #{user_name}")
+    classic_require_code_owner_review = @obj.rules_required_pull_request_reviews('main').nil? || @obj.rules_required_pull_request_reviews('develop')["require_code_owner_reviews"]
+    pull_request_rulesets_rules = @obj.get_branch_ruleset('main')
+    rulesets_require_code_owner_review = pull_request_rulesets_rules&.find { |rule| rule['type'] == 'pull_request' }&.[]('parameters')&.[]('require_code_owner_review')
+    assert_not_nil(classic_require_code_owner_review || rulesets_require_code_owner_review, "We should not allow merge to main branch without approve from #{user_name}")
   end
 
   def test_PR_template_present
