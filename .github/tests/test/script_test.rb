@@ -98,11 +98,11 @@ class ScriptTest < Test::Unit::TestCase
   end
 
   def test_approve_from_user
-    user_name = 'online-marathon'
-    classic_require_code_owner_review = @obj.rules_required_pull_request_reviews('main').nil? || @obj.rules_required_pull_request_reviews('develop')["require_code_owner_reviews"]
+    user_name = 'softservedata'
+    classic_require_code_owner_review = @obj.rules_required_pull_request_reviews('main').nil?
     pull_request_rulesets_rules = @obj.get_branch_ruleset('main')
     rulesets_require_code_owner_review = pull_request_rulesets_rules&.find { |rule| rule['type'] == 'pull_request' }&.[]('parameters')&.[]('require_code_owner_review')
-    assert_not_nil(classic_require_code_owner_review || rulesets_require_code_owner_review, "We should not allow merge to main branch without approve from #{user_name}")
+    assert(classic_require_code_owner_review || rulesets_require_code_owner_review, "We should not allow merge to main branch without approve from #{user_name}")
   end
 
   def test_PR_template_present
